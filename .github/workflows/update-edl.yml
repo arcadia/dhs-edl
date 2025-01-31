@@ -1,0 +1,22 @@
+name: Update DHS EDL
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Runs every 6 hours
+  workflow_dispatch:  # Allows manual execution
+
+jobs:
+  update-edl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run Fetch Script
+        run: |
+          chmod +x fetch_dhs_ips.sh
+          ./fetch_dhs_ips.sh
+
+      - name: Commit & Push Changes
+        run: |
+          git add dhs-ips.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update DHS EDL" && git push)
